@@ -23,11 +23,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: get last commit
-        run: |
-          export COMMIT=$(git rev-parse --short HEAD)
-
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -40,28 +36,28 @@ jobs:
         id: build-postgres
         run: |
           make postgres
-          docker tag cybertec-pg-container/postgres:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/postgres-$BASEOS-$PGVERSION_FULL-$COMMIT
+          docker tag cybertec-pg-container/postgres:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/postgres-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
       # docker save -o postgres.tar $CONTAINER_REPO/postgres-$BASEOS-$PGVERSION_FULL-$BUILD
 
       - name: Build Postgres with GIS $IMAGE_TAG_PREFIX-$POSTGIS_VERSION-$IMAGE_TAG_SUFFIX
         id: build-postgres-gis
         run: |
           make postgres-gis
-          docker tag cybertec-pg-container/postgres-gis:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/postgres-gis-$BASEOS-$PGVERSION_FULL-$POSTGIS_VERSION-$COMMIT
+          docker tag cybertec-pg-container/postgres-gis:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/postgres-gis-$BASEOS-$PGVERSION_FULL-$POSTGIS_VERSION-$GITHUB_SHA
       # docker save -o postgres-gis.tar $CONTAINER_REPO/postgres-gis-$BASEOS-$PGVERSION_FULL-$POSTGIS_VERSION-$BUILD
 
       - name: Build pgBackRest
         id: build-pgbackrest
         run: |
           make pgbackrest
-          docker tag cybertec-pg-container/pgbackrest:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/pgbackrest-$BASEOS-$PGVERSION_FULL-$COMMIT
+          docker tag cybertec-pg-container/pgbackrest:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/pgbackrest-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
           # docker save -o pgbackrest.tar $CONTAINER_REPO/pgbackrest-$BASEOS-$PGVERSION_FULL-$BUILD
 
       - name: Build exporter
         id: build-exporter
         run: |
           make exporter
-          docker tag cybertec-pg-container/exporter:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/exporter-$BASEOS-$PGVERSION_FULL-$COMMIT
+          docker tag cybertec-pg-container/exporter:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/exporter-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
       # docker save -o exporter.tar $CONTAINER_REPO/exporter-$BASEOS-$PGVERSION_FULL-$BUILD
 
       - name: Build pgBouncer
@@ -69,18 +65,18 @@ jobs:
         run: |
           make pgbouncer
           docker images
-          docker tag cybertec-pg-container/pgbouncer:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/pgbouncer-$BASEOS-$PGVERSION_FULL-$COMMIT
+          docker tag cybertec-pg-container/pgbouncer:$BASEOS-$PGVERSION_FULL-$BUILD $CONTAINER_REPO/pgbouncer-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
 
             - name: Log in to Docker Hub
         run: echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
       - name: push Containers
         run: |
-          docker push $CONTAINER_REPO/postgres-$BASEOS-$PGVERSION_FULL-$COMMIT
-          docker push $CONTAINER_REPO/postgres-gis-$BASEOS-$PGVERSION_FULL-$POSTGIS_VERSION-$COMMIT
-          docker push $CONTAINER_REPO/pgbackrest-$BASEOS-$PGVERSION_FULL-$COMMIT
-          docker push $CONTAINER_REPO/exporter-$BASEOS-$PGVERSION_FULL-$COMMIT
-          docker push $CONTAINER_REPO/pgbouncer-$BASEOS-$PGVERSION_FULL-$COMMIT
+          docker push $CONTAINER_REPO/postgres-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
+          docker push $CONTAINER_REPO/postgres-gis-$BASEOS-$PGVERSION_FULL-$POSTGIS_VERSION-$GITHUB_SHA
+          docker push $CONTAINER_REPO/pgbackrest-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
+          docker push $CONTAINER_REPO/exporter-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
+          docker push $CONTAINER_REPO/pgbouncer-$BASEOS-$PGVERSION_FULL-$GITHUB_SHA
       #     docker save -o pgbouncer.tar $CONTAINER_REPO/pgbouncer-$BASEOS-$PGVERSION_FULL-$BUILD 
             
       # - name: Upload Containers
