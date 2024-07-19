@@ -12,6 +12,7 @@ OLD_PG_VERSIONS ?= 13 14 15
 PATRONI_VERSION ?= 3.3.1
 PGBACKREST_VERSION ?= 2.52.1
 POSTGIS_VERSION ?= 34
+FERRETDBVERSION ?= v1.22.0
 PACKAGER ?= dnf
 BUILD ?= 1
 ARCH ?= amd64
@@ -36,6 +37,7 @@ postgres-stage: base postgres-stage
 postgres-gis: base postgres-gis
 postgres-oracle: base postgres-oracle
 pgbouncer: pgbouncer
+ferrtedb: ferretdb
 exporter: exporter
 publicbeta: publicbeta-pg publicbeta-pgbackrest
 
@@ -157,6 +159,23 @@ pgbouncer-build:
 			--build-arg PGVERSION=$(PGVERSION)
 
 pgbouncer: pgbouncer-build
+
+ferretdb-build:
+		docker build $(ROOTPATH)														\
+			--file $(ROOTPATH)/docker/ferretdb/Dockerfile 								\
+			--tag cybertec-pg-container/ferretdb:$(IMAGE_TAG)							\
+			--build-arg BASE_IMAGE=$(BASE_IMAGE)										\
+			--build-arg CONTAINERIMAGE=${CONTAINERIMAGE} 								\
+			--build-arg IMAGE_REPOSITORY=$(IMAGE_REPOSITORY)							\
+			--build-arg BASEOS=$(BASEOS) 												\
+			--build-arg PACKAGER=$(PACKAGER) 											\
+			--build-arg CONTAINERSUITE=$(CONTAINERSUITE) 								\
+			--build-arg BUILD=$(BUILD) 													\
+			--build-arg PGVERSION=$(PGVERSION)											\
+			--build-arg FERRETDBVERSION=$(FERRETDBVERSION)								\
+			--build-arg ARCH=$(ARCH)
+
+ferretdb: ferretdb-build
 
 exporter-build:
 		docker build $(ROOTPATH)														\
