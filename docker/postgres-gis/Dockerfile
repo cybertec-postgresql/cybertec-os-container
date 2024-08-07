@@ -13,7 +13,6 @@ ARG PGVERSION
 ARG OLD_PG_VERSIONS
 ARG PG_SUPPORTED_VERSIONS="$PGVERSION"
 ARG PG_SUPPORTED_VERSIONS="$OLD_PG_VERSIONS $PGVERSION"
-ARG ARCH
 ARG POSTGIS_VERSION
 ARG ETCD_VERSION
 ARG ARCH
@@ -62,14 +61,6 @@ RUN ${PACKAGER} -y update && ${PACKAGER} -y install --nodocs --noplugins --setop
 # install etcdctl
 RUN curl -L https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-${ARCH}.tar.gz | tar xz -C /bin --strip=1 --wildcards --no-anchored --no-same-owner etcdctl etcd;
 
-# Install Patroni
-RUN pip3 install 'PyYAML<6.0' setuptools pystache loader dumb-init kazoo meld3 boto 
-#swiftclient
-RUN ${PACKAGER} -y install python3-etcd python3-consul  \
-                         python3-gevent python3-greenlet python3-cachetools \
-                        python3-rsa python3-pyasn1-modules  python3-cffi \
-    && ${PACKAGER} -y clean all;
-
 ENV PATHBACKUP = $PATH
 
 RUN wget https://smarden.org/runit/runit-2.1.2.tar.gz -P /package/
@@ -110,7 +101,7 @@ RUN pip3 install 'PyYAML<6.0' setuptools pystache loader kazoo meld3 boto python
             # Install Postgis
             && ${PACKAGER} -y install postgis${POSTGIS_VERSION}_${version} \
             # Install TimescaleDB  
-            && ${PACKAGER} -y install timescaledb_${version} \       \
+            && ${PACKAGER} -y install timescaledb_${version} \
             && cd / \
             && for n in set_user pg_permissions $EXTRA_EXTENSIONS; do \ 
                 #pg_profile-${PG_PROFILE} pg_tm_aux-${PG_TM_AUX_COMMIT} bg_mon-${BG_MON_COMMIT} pg_auth_mon-${PG_AUTH_MON_COMMIT}
